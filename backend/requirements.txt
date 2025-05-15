@@ -1,0 +1,4 @@
+flask==3.0.3
+rdkit==2025.3.2      # o deja simplemente rdkit
+requests==2.31.0
+gunicorn==22.0.0     # opcional en Windows; útil para Docker
