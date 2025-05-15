@@ -12,20 +12,22 @@ class ResolveError(Exception):
     """Error de resolución de identificador químico."""
 
 def fetch_smiles(identifier: str) -> str:
-    """Convierte CAS o ChEMBL a SMILES.  
-    Si ya es SMILES lo devuelve tal cual."""
-    if SMILES_RX.fullmatch(identifier):
-        return identifier
-
+    """Convierte CAS o ChEMBL a SMILES; si nada coincide, asume SMILES."""
+    # 1️⃣ CAS
     if CAS_RX.fullmatch(identifier):
         url = f"{PUBCHEM}/compound/name/{identifier}/property/IsomericSMILES/JSON"
         r = requests.get(url, timeout=HTTP_TIMEOUT)
         r.raise_for_status()
         return r.json()["PropertyTable"]["Properties"][0]["IsomericSMILES"]
 
+    # 2️⃣ ChEMBL
     if identifier.lower().startswith("chembl"):
         r = requests.get(CHEMBL.format(identifier.upper()), timeout=HTTP_TIMEOUT)
         r.raise_for_status()
         return r.json()["molecule_structures"]["canonical_smiles"]
+
+    # 3️⃣ SMILES (por descarte)
+    if SMILES_RX.fullmatch(identifier):
+        return identifier
 
     raise ResolveError("Identificador no soportado")
