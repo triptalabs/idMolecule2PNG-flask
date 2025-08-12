@@ -82,9 +82,9 @@ npm run lint
 
 ## Licencia
 
-Este proyecto se ofrece sin licencia explícita; verifique antes de usar en producción.
-=======
+Este proyecto se distribuye bajo la licencia MIT. Consulta [LICENSE](LICENSE) para más detalles.
+
 ## License
 
-This project is licensed under the MIT License - see [LICENSE](LICENSE) for details.
+This project is licensed under the MIT License – see [LICENSE](LICENSE) for details.
 
