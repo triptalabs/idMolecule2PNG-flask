@@ -38,7 +38,7 @@ export default function App() {
   const download = () => {
     if (!imgUrl) return
     const link = document.createElement('a')
-    const safeName = filename.trim().replace(/[^a-z0-9_\-\.]/gi, '_') || 'mol.png'
+    const safeName = filename.trim().replace(/[^a-z0-9_\-.]/gi, '_') || 'mol.png'
     link.href = imgUrl
     link.download = safeName
     document.body.appendChild(link)
