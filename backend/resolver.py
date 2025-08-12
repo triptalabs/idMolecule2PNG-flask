@@ -16,15 +16,29 @@ def fetch_smiles(identifier: str) -> str:
     # 1️⃣ CAS
     if CAS_RX.fullmatch(identifier):
         url = f"{PUBCHEM}/compound/name/{identifier}/property/IsomericSMILES/JSON"
-        r = requests.get(url, timeout=HTTP_TIMEOUT)
-        r.raise_for_status()
-        return r.json()["PropertyTable"]["Properties"][0]["IsomericSMILES"]
+        try:
+            r = requests.get(url, timeout=HTTP_TIMEOUT)
+            r.raise_for_status()
+        except requests.RequestException as exc:
+            raise ResolveError(f"Error al consultar PubChem: {exc}") from exc
+        data = r.json()
+        smiles = data.get("PropertyTable", {}).get("Properties", [{}])[0].get("IsomericSMILES")
+        if not smiles:
+            raise ResolveError("Respuesta de PubChem inválida")
+        return smiles
 
     # 2️⃣ ChEMBL
     if identifier.lower().startswith("chembl"):
-        r = requests.get(CHEMBL.format(identifier.upper()), timeout=HTTP_TIMEOUT)
-        r.raise_for_status()
-        return r.json()["molecule_structures"]["canonical_smiles"]
+        try:
+            r = requests.get(CHEMBL.format(identifier.upper()), timeout=HTTP_TIMEOUT)
+            r.raise_for_status()
+        except requests.RequestException as exc:
+            raise ResolveError(f"Error al consultar ChEMBL: {exc}") from exc
+        data = r.json()
+        smiles = data.get("molecule_structures", {}).get("canonical_smiles")
+        if not smiles:
+            raise ResolveError("Respuesta de ChEMBL inválida")
+        return smiles
 
     # 3️⃣ SMILES (por descarte)
     if SMILES_RX.fullmatch(identifier):
